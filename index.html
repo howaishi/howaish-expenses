@@ -132,6 +132,23 @@ textarea{resize:none;min-height:72px;line-height:1.5}
 .refund-mode .header{background:#b8860b!important}
 .refund-banner{display:none;background:#fef3c7;border:1px solid #f0d080;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:#92400e;font-weight:500;margin-bottom:12px;text-align:center}
 .refund-mode .refund-banner{display:block}
+
+.po-screen{padding:16px;padding-bottom:80px}
+.po-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.po-badge.pending{background:#fef3c7;color:#92400e}
+.po-badge.signed{background:#e8f5ee;color:#2d7a4f}
+.po-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
+.po-item-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.po-item-title{font-size:14px;font-weight:600;color:var(--text)}
+.po-item-amount{font-size:16px;font-weight:600;color:var(--primary)}
+.po-item-details{font-size:12px;color:var(--text2);line-height:1.8}
+.po-sign-btn{width:100%;padding:10px;background:none;border:1.5px solid #2d7a4f;border-radius:var(--radius-sm);color:#2d7a4f;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;font-weight:500;cursor:pointer;margin-top:10px}
+.po-sign-btn:disabled{border-color:var(--border);color:var(--text3);cursor:not-allowed}
+.po-signed-label{text-align:center;font-size:12px;color:#2d7a4f;margin-top:8px;font-weight:500}
+.week-summary{background:var(--primary);color:white;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.week-summary .ws-label{font-size:12px;opacity:0.7}
+.week-summary .ws-val{font-size:18px;font-weight:600}
+.po-empty{text-align:center;color:var(--text3);padding:30px;font-size:13px}
 </style>
 </head>
 <body>
@@ -401,6 +418,108 @@ textarea{resize:none;min-height:72px;line-height:1.5}
   </div>
 </div>
 
+
+<!-- Payment Orders Screen -->
+<div class="screen" id="screen-po">
+  <div class="header">
+    <div class="header-top">
+      <h1>أوامر الصرف</h1>
+      <span class="badge-header">حي الربوة</span>
+    </div>
+    <div class="header-sub">الدفعات النقدية للمقاولين</div>
+  </div>
+  <div class="po-screen">
+    
+    <!-- Add new order -->
+    <div class="section" style="margin-bottom:12px">
+      <div class="section-header">
+        <div class="section-icon">➕</div>
+        <div class="section-title">إضافة أمر صرف جديد</div>
+      </div>
+      <div class="section-body">
+        <div id="po-success" style="display:none;background:#e8f5ee;border:1px solid #a8d5b8;border-radius:8px;padding:10px 14px;font-size:13px;color:#2d7a4f;margin-bottom:14px">تم حفظ أمر الصرف بنجاح ✓</div>
+        
+        <div class="field">
+          <label><span class="req">*</span>اسم المقاول</label>
+          <input type="text" id="po-contractor" placeholder="اسم المقاول أو الشركة">
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label><span class="req">*</span>البند</label>
+            <select id="po-category">
+              <option value="">اختر...</option>
+              <option value="مقاول النجارة">مقاول النجارة</option>
+              <option value="مقاول الحدادة">مقاول الحدادة</option>
+              <option value="مقاول السباكة">مقاول السباكة</option>
+              <option value="مقاول الكهرباء">مقاول الكهرباء</option>
+              <option value="مقاولون آخرون">مقاولون آخرون</option>
+            </select>
+          </div>
+          <div class="field">
+            <label><span class="req">*</span>رقم الدفعة</label>
+            <input type="text" id="po-payment-no" placeholder="مثال: 3">
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="req">*</span>المبلغ (ريال)</label>
+          <input type="number" id="po-amount" placeholder="0.00" min="0">
+        </div>
+
+        <div class="field">
+          <label style="margin-bottom:8px"><span class="req">*</span>توزيع مراكز التكلفة (%)</label>
+          <div class="dist-grid">
+            <div class="dist-item" id="po-di-825">
+              <div class="dist-label">مشروع 825</div>
+              <div class="dist-row"><input type="number" class="dist-input" id="po-d-825" min="0" max="100" value="0" oninput="onPODist()"><span class="dist-pct">%</span></div>
+              <div class="dist-amount" id="po-a-825">—</div>
+            </div>
+            <div class="dist-item" id="po-di-600">
+              <div class="dist-label">مشروع 600</div>
+              <div class="dist-row"><input type="number" class="dist-input" id="po-d-600" min="0" max="100" value="0" oninput="onPODist()"><span class="dist-pct">%</span></div>
+              <div class="dist-amount" id="po-a-600">—</div>
+            </div>
+            <div class="dist-item" id="po-di-540">
+              <div class="dist-label">مشروع 540</div>
+              <div class="dist-row"><input type="number" class="dist-input" id="po-d-540" min="0" max="100" value="0" oninput="onPODist()"><span class="dist-pct">%</span></div>
+              <div class="dist-amount" id="po-a-540">—</div>
+            </div>
+            <div class="dist-item" id="po-di-360">
+              <div class="dist-label">مشروع 360</div>
+              <div class="dist-row"><input type="number" class="dist-input" id="po-d-360" min="0" max="100" value="0" oninput="onPODist()"><span class="dist-pct">%</span></div>
+              <div class="dist-amount" id="po-a-360">—</div>
+            </div>
+          </div>
+          <div class="total-bar neutral" id="po-tbar">
+            <div><div class="tlabel neutral" id="po-tlabel">أدخل النسب</div>
+            <div class="progress-track"><div class="progress-fill" id="po-pfill" style="width:0%;background:var(--border)"></div></div></div>
+            <div class="tnum neutral" id="po-tnum">0%</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="req">*</span>ملاحظات</label>
+          <input type="text" id="po-notes" placeholder="وصف الدفعة أو أي تفاصيل مهمة...">
+        </div>
+        
+        <button class="btn-submit" onclick="savePaymentOrder()" style="margin-top:4px">حفظ أمر الصرف</button>
+      </div>
+    </div>
+    
+    <!-- Weekly orders list -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">📋</div>
+        <div class="section-title">أوامر الأسبوع الحالي</div>
+      </div>
+      <div class="section-body" style="padding:0">
+        <div id="po-list"><div class="po-empty">جاري التحميل...</div></div>
+      </div>
+    </div>
+    
+  </div>
+</div>
 <!-- Bottom Navigation -->
 <nav class="bottom-nav">
   <button class="nav-btn active" id="nav-expense" onclick="switchScreen('expense')">
@@ -412,8 +531,12 @@ textarea{resize:none;min-height:72px;line-height:1.5}
     <span class="nav-label">الرصيد</span>
   </button>
   <button class="nav-btn" id="nav-deposit" onclick="requestDeposit()">
-    <span class="nav-icon">➕</span>
+    <span class="nav-icon">💰</span>
     <span class="nav-label">إيداع</span>
+  </button>
+  <button class="nav-btn" id="nav-po" onclick="requestPO()">
+    <span class="nav-icon">📄</span>
+    <span class="nav-label" style="font-size:9px">أمر صرف نقدي</span>
   </button>
 </nav>
 <script>
@@ -720,6 +843,7 @@ function switchScreen(name) {
   document.getElementById('screen-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
   if(name==='balance') loadBalance();
+  if(name==='po') loadPOList();
 }
 
 function requestDeposit() {
@@ -957,6 +1081,320 @@ function setType(type) {
     document.querySelector('.header').style.background = 'var(--primary)';
   }
 }
+
+
+var PO_PROJS = ['825','600','540','360'];
+
+function onPODist() {
+  var amt = parseFloat(document.getElementById('po-amount').value)||0;
+  var total = 0;
+  PO_PROJS.forEach(function(p){
+    var pct = parseFloat(document.getElementById('po-d-'+p).value)||0;
+    total += pct;
+    document.getElementById('po-a-'+p).textContent = pct>0 ? fmt(amt*pct/100)+' ر.س' : '—';
+  });
+  total = Math.round(total*10)/10;
+  var bar=document.getElementById('po-tbar');
+  var lbl=document.getElementById('po-tlabel');
+  var num=document.getElementById('po-tnum');
+  var fill=document.getElementById('po-pfill');
+  bar.className='total-bar'; lbl.className='tlabel'; num.className='tnum';
+  num.textContent=total+'%';
+  fill.style.width=Math.min(total,100)+'%';
+  PO_PROJS.forEach(function(p){ document.getElementById('po-di-'+p).classList.remove('over','complete'); });
+  if(total===0){bar.classList.add('neutral');lbl.classList.add('neutral');num.classList.add('neutral');lbl.textContent='أدخل النسب';fill.style.background='var(--border)';}
+  else if(Math.abs(total-100)<0.1){bar.classList.add('ok');lbl.classList.add('ok');num.classList.add('ok');lbl.textContent='التوزيع مكتمل ✓';fill.style.background='var(--success)';PO_PROJS.forEach(function(p){if(parseFloat(document.getElementById('po-d-'+p).value)>0)document.getElementById('po-di-'+p).classList.add('complete');});}
+  else if(total>100){bar.classList.add('over');lbl.classList.add('over');num.classList.add('over');lbl.textContent='تجاوز الحد!';fill.style.background='var(--error)';PO_PROJS.forEach(function(p){document.getElementById('po-di-'+p).classList.add('over');});}
+  else{bar.classList.add('under');lbl.classList.add('under');num.classList.add('under');lbl.textContent='التوزيع غير مكتمل';fill.style.background='var(--warning)';}
+}
+
+var PO_PIN = '6720';
+var poUnlocked = false;
+
+function requestPO() {
+  if(poUnlocked) {
+    switchScreen('po');
+    return;
+  }
+  document.getElementById('pin-overlay').style.display='flex';
+  document.getElementById('pin-input').value='';
+  document.getElementById('pin-input').classList.remove('err');
+  pinTarget = 'po';
+  setTimeout(function(){ document.getElementById('pin-input').focus(); },100);
+}
+
+// Override checkPin to handle PO screen
+var origCheckPin = checkPin;
+checkPin = function() {
+  var val = document.getElementById('pin-input').value;
+  if(pinTarget === 'po') {
+    if(val === PO_PIN) {
+      document.getElementById('pin-overlay').style.display='none';
+      poUnlocked = true;
+      switchScreen('po');
+      loadPOList();
+    } else {
+      var inp = document.getElementById('pin-input');
+      inp.classList.add('err');
+      inp.value='';
+      setTimeout(function(){ inp.classList.remove('err'); },400);
+    }
+  } else {
+    origCheckPin();
+  }
+};
+
+// Init PO date
+document.addEventListener('DOMContentLoaded', function(){
+  var d = new Date();
+  var dateStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var poDate = document.getElementById('po-date');
+  if(poDate) poDate.value = dateStr;
+});
+
+function savePaymentOrder() {
+  var contractor = document.getElementById('po-contractor').value.trim();
+  var category = document.getElementById('po-category').value;
+  var paymentNo = document.getElementById('po-payment-no').value.trim();
+  var amount = parseFloat(document.getElementById('po-amount').value);
+  var notes = document.getElementById('po-notes').value.trim();
+  var now_date = new Date().toISOString().split('T')[0];
+  
+  // Check dist total
+  var distTotal = 0;
+  PO_PROJS.forEach(function(p){ distTotal += parseFloat(document.getElementById('po-d-'+p).value)||0; });
+  distTotal = Math.round(distTotal*10)/10;
+
+  if(!contractor){ alert('الرجاء إدخال اسم المقاول'); return; }
+  if(!category){ alert('الرجاء اختيار البند'); return; }
+  if(!paymentNo){ alert('الرجاء إدخال رقم الدفعة'); return; }
+  if(!amount||amount<=0){ alert('الرجاء إدخال المبلغ'); return; }
+  if(Math.abs(distTotal-100)>0.1){ alert('مجموع النسب '+distTotal+'% — يجب أن يكون 100%'); return; }
+  if(!notes){ alert('الرجاء إدخال الملاحظات'); return; }
+  
+  var p825=parseFloat(document.getElementById('po-d-825').value)||0;
+  var p600=parseFloat(document.getElementById('po-d-600').value)||0;
+  var p540=parseFloat(document.getElementById('po-d-540').value)||0;
+  var p360=parseFloat(document.getElementById('po-d-360').value)||0;
+  var amt825=Math.round(amount*p825/100*100)/100;
+  var amt600=Math.round(amount*p600/100*100)/100;
+  var amt540=Math.round(amount*p540/100*100)/100;
+  var amt360=Math.round(amount*p360/100*100)/100;
+  
+  var btn = document.querySelector('#screen-po .btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'جاري الحفظ...';
+  
+  var SHEET_ID = '1T9ezLe-REh_tN4RwMXfiSue6oy05aktkvUBm08G7KaI';
+  var SA_EMAIL = 'howaish-expenses@road-cafe-stock-dlvry-project.iam.gserviceaccount.com';
+  var PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDiKTx6TCqDP5km\ngXoZ11+t//iK+r4hPty/jDSXp1ch7w+YdbAbEz/NntWd2F1xn56obRFXRsteceyp\nCmqWcagKWDN5YSklIlaidIRoOK6quBgp5+u7SdBU0qm7pQsjs7p+YMk+ZYXPcAAc\nmXp5lKE+UMiYoelGfPo/cqz77xlqOZXOpgRGnNKy66Juk8qwMa61M3rGphkNoiaB\nZISjGcJ4C6sbJ+lSe84jfkp5mflWIuu41PpfpThj/TNp05eBPnRzSrPtTrdAHPJH\nSSY0m1LPmtvgPHzGkViosHGtcLn3gLDpQcDmUSqHCeG/3Gfi7NZYL2V3UaF1xsWX\nUtwZREj7AgMBAAECggEAYv2UpJ0hAIi+Uq3akWQFU6ZWFhLxVKDsw4StYnHTAB3g\n0CU3G2q+AxTSQIA7SmgI7ISs0exBSMoJweW2yLnfyQNZKHhAJ6pTjFD+wZWJ0ly4\n6uLB+hyxbOc2dtUjPpHE/9sCSubp/mVyDxKYmo3VU+7NFo3MCtfaOxpJIA7EK4tN\nTnZQjpGcG/PhsijIy7b76lWCytUqDUTt2VMdAnFH/e0g+iLwZzo5/wUOtGgu0gvx\nOTGZgW8TjBRolqrVfTQBjcqc88Ppe7FlZvluoadtqdYkZFjUOMsU/SVSpTb6DDJn\n+gfYWsnh1QZtzFyRkDv1Frd2DOvHsEwUKCzRnhqPRQKBgQD3nL5wX7MCsYPisl5D\nafzVfSpmU1zvWruQnnnyCKRVx60CYUS6mfijJtmxdNNss5bINlCZwK+wNU9xNYsA\nL4S34ZRMrK5268yxbAivj/mrzqQXVp3w/oqaeneCrkU8KrySmyb4rQgYkrlNnqMe\nQCIJDaD5ih5w6eNExtD81xhCFQKBgQDp0niErHGfOpIFuok0JfE9pFjDsxdJHh9r\nVlJ2dbkwGXv/sjoDBWYs09utS45GU6PoBxcWez9dCmEXodAjMexwJ/UOADvAclhW\nhYIIyIid3gf+gqgF6QakZ6pwplA1WIfy4A4rJjLUW/N9d9zc8qEhk22GI3PlEWGo\nkf4IxDPyzwKBgE+Tmkh3GQq2jhIfDNhRiaX60dOM2wM5f6ocpEg6qsW+pEVtiS8H\nKLcWV0QGraPzm3PAsOqY2F2i5GMXuBJZMyf9YTG7FV62rVQfyjLR7IVgpa+ycJPw\n2g6HaT0gULPjcDMVldK5mS58iPz/DKE+LzIFpURNNTdIk3eZBbUcU3l5AoGAdruA\npWZnoAJ+6dfKGif2M2YECQQlG+Tm8Xt5DlxDOHCIbdQT7zrLopHGKF6IlZ+dSJJp\nH+pfx6Ago35wkZ6lQGKZ5o0pylSGFRFgcZNbBEcd6hhwt+eXjt5xRxi8/AnDpwot\nR63y+7DhmOHHzo6KUeFqKUZRcI19+LqBs/PlqTMCgYADKWCfZpbKD0OJ0qQnWIDd\naIlXazoOeO2VyNrgs1nAJ1ie6/Hrl6wZlKRlQ3C6S/jtu3AS/GLQoogPfJ3AYL62\npExfcr8cjIJX3AxwU9uAcrtsn9+SDzxAYmrkaJQfuawqC1e+x7Ubt6q/Ma4H19uu\nFD48HsGV5Eyb4g76cBOOwg==\n-----END PRIVATE KEY-----\n';
+
+  function b64u(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
+  function b64uU8(a){return btoa(Array.from(a).map(function(b){return String.fromCharCode(b);}).join('')).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
+  var now=Math.floor(Date.now()/1000);
+  var si=b64u(JSON.stringify({alg:'RS256',typ:'JWT'}))+'.'+b64u(JSON.stringify({iss:SA_EMAIL,scope:'https://www.googleapis.com/auth/spreadsheets',aud:'https://oauth2.googleapis.com/token',exp:now+3600,iat:now}));
+  var bk=Uint8Array.from(atob(PRIVATE_KEY.replace('-----BEGIN PRIVATE KEY-----','').replace('-----END PRIVATE KEY-----','').replace(/\n/g,'').replace(/\s/g,'')),function(c){return c.charCodeAt(0);});
+  
+  crypto.subtle.importKey('pkcs8',bk.buffer,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['sign'])
+  .then(function(k){return crypto.subtle.sign('RSASSA-PKCS1-v1_5',k,new TextEncoder().encode(si));})
+  .then(function(sig){
+    return fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion='+si+'.'+b64uU8(new Uint8Array(sig))});
+  })
+  .then(function(r){return r.json();})
+  .then(function(token){
+    if(!token.access_token) throw new Error('No token');
+    var ts = new Date().toISOString();
+    // First get current row count for serial number
+    return fetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/Sheet3!A:A',{
+      headers:{'Authorization':'Bearer '+token.access_token}
+    }).then(function(r){return r.json();}).then(function(d){
+      var serial = (d.values ? d.values.length : 1);
+      return fetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/Sheet3!A1:append?valueInputOption=USER_ENTERED',{
+        method:'POST',
+        headers:{'Authorization':'Bearer '+token.access_token,'Content-Type':'application/json'},
+        body:JSON.stringify({values:[[serial, now_date, contractor, category, paymentNo, amount, p825, p600, p540, p360, amt825, amt600, amt540, amt360, notes, 'بانتظار التوقيع', '', ts]]})
+      });
+    });
+  })
+  .then(function(r){return r.json();})
+  .then(function(result){
+    btn.disabled=false; btn.textContent='حفظ أمر الصرف';
+    if(result.updates){
+      document.getElementById('po-contractor').value='';
+      document.getElementById('po-category').value='';
+      document.getElementById('po-payment-no').value='';
+      document.getElementById('po-amount').value='';
+      document.getElementById('po-notes').value='';
+      PO_PROJS.forEach(function(p){
+        document.getElementById('po-d-'+p).value=0;
+        document.getElementById('po-a-'+p).textContent='—';
+        document.getElementById('po-di-'+p).classList.remove('over','complete');
+      });
+      onPODist();
+      var msg=document.getElementById('po-success');
+      msg.style.display='block';
+      setTimeout(function(){msg.style.display='none';},3000);
+      loadPOList();
+    } else {
+      alert('خطأ: '+JSON.stringify(result));
+    }
+  })
+  .catch(function(err){
+    btn.disabled=false; btn.textContent='حفظ أمر الصرف';
+    alert('خطأ: '+err.toString());
+  });
+}
+
+function signOrder(rowIndex, btn) {
+  // Sign the order at rowIndex in Sheet3
+  btn.disabled = true;
+  btn.textContent = 'جاري التوقيع...';
+  
+  var SHEET_ID = '1T9ezLe-REh_tN4RwMXfiSue6oy05aktkvUBm08G7KaI';
+  var SA_EMAIL = 'howaish-expenses@road-cafe-stock-dlvry-project.iam.gserviceaccount.com';
+  var PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDiKTx6TCqDP5km\ngXoZ11+t//iK+r4hPty/jDSXp1ch7w+YdbAbEz/NntWd2F1xn56obRFXRsteceyp\nCmqWcagKWDN5YSklIlaidIRoOK6quBgp5+u7SdBU0qm7pQsjs7p+YMk+ZYXPcAAc\nmXp5lKE+UMiYoelGfPo/cqz77xlqOZXOpgRGnNKy66Juk8qwMa61M3rGphkNoiaB\nZISjGcJ4C6sbJ+lSe84jfkp5mflWIuu41PpfpThj/TNp05eBPnRzSrPtTrdAHPJH\nSSY0m1LPmtvgPHzGkViosHGtcLn3gLDpQcDmUSqHCeG/3Gfi7NZYL2V3UaF1xsWX\nUtwZREj7AgMBAAECggEAYv2UpJ0hAIi+Uq3akWQFU6ZWFhLxVKDsw4StYnHTAB3g\n0CU3G2q+AxTSQIA7SmgI7ISs0exBSMoJweW2yLnfyQNZKHhAJ6pTjFD+wZWJ0ly4\n6uLB+hyxbOc2dtUjPpHE/9sCSubp/mVyDxKYmo3VU+7NFo3MCtfaOxpJIA7EK4tN\nTnZQjpGcG/PhsijIy7b76lWCytUqDUTt2VMdAnFH/e0g+iLwZzo5/wUOtGgu0gvx\nOTGZgW8TjBRolqrVfTQBjcqc88Ppe7FlZvluoadtqdYkZFjUOMsU/SVSpTb6DDJn\n+gfYWsnh1QZtzFyRkDv1Frd2DOvHsEwUKCzRnhqPRQKBgQD3nL5wX7MCsYPisl5D\nafzVfSpmU1zvWruQnnnyCKRVx60CYUS6mfijJtmxdNNss5bINlCZwK+wNU9xNYsA\nL4S34ZRMrK5268yxbAivj/mrzqQXVp3w/oqaeneCrkU8KrySmyb4rQgYkrlNnqMe\nQCIJDaD5ih5w6eNExtD81xhCFQKBgQDp0niErHGfOpIFuok0JfE9pFjDsxdJHh9r\nVlJ2dbkwGXv/sjoDBWYs09utS45GU6PoBxcWez9dCmEXodAjMexwJ/UOADvAclhW\nhYIIyIid3gf+gqgF6QakZ6pwplA1WIfy4A4rJjLUW/N9d9zc8qEhk22GI3PlEWGo\nkf4IxDPyzwKBgE+Tmkh3GQq2jhIfDNhRiaX60dOM2wM5f6ocpEg6qsW+pEVtiS8H\nKLcWV0QGraPzm3PAsOqY2F2i5GMXuBJZMyf9YTG7FV62rVQfyjLR7IVgpa+ycJPw\n2g6HaT0gULPjcDMVldK5mS58iPz/DKE+LzIFpURNNTdIk3eZBbUcU3l5AoGAdruA\npWZnoAJ+6dfKGif2M2YECQQlG+Tm8Xt5DlxDOHCIbdQT7zrLopHGKF6IlZ+dSJJp\nH+pfx6Ago35wkZ6lQGKZ5o0pylSGFRFgcZNbBEcd6hhwt+eXjt5xRxi8/AnDpwot\nR63y+7DhmOHHzo6KUeFqKUZRcI19+LqBs/PlqTMCgYADKWCfZpbKD0OJ0qQnWIDd\naIlXazoOeO2VyNrgs1nAJ1ie6/Hrl6wZlKRlQ3C6S/jtu3AS/GLQoogPfJ3AYL62\npExfcr8cjIJX3AxwU9uAcrtsn9+SDzxAYmrkaJQfuawqC1e+x7Ubt6q/Ma4H19uu\nFD48HsGV5Eyb4g76cBOOwg==\n-----END PRIVATE KEY-----\n';
+
+  function b64u(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
+  function b64uU8(a){return btoa(Array.from(a).map(function(b){return String.fromCharCode(b);}).join('')).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
+  var now=Math.floor(Date.now()/1000);
+  var si=b64u(JSON.stringify({alg:'RS256',typ:'JWT'}))+'.'+b64u(JSON.stringify({iss:SA_EMAIL,scope:'https://www.googleapis.com/auth/spreadsheets',aud:'https://oauth2.googleapis.com/token',exp:now+3600,iat:now}));
+  var bk=Uint8Array.from(atob(PRIVATE_KEY.replace('-----BEGIN PRIVATE KEY-----','').replace('-----END PRIVATE KEY-----','').replace(/\n/g,'').replace(/\s/g,'')),function(c){return c.charCodeAt(0);});
+  var signTime = new Date().toLocaleString('ar-SA');
+  
+  crypto.subtle.importKey('pkcs8',bk.buffer,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['sign'])
+  .then(function(k){return crypto.subtle.sign('RSASSA-PKCS1-v1_5',k,new TextEncoder().encode(si));})
+  .then(function(sig){
+    return fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion='+si+'.'+b64uU8(new Uint8Array(sig))});
+  })
+  .then(function(r){return r.json();})
+  .then(function(token){
+    if(!token.access_token) throw new Error('No token');
+    // Update columns I and J (status and sign time) for this row
+    // Columns P=16(status) Q=17(signature) R=18(sign time) -> Sheet cols P,Q,R
+    var range = 'Sheet3!P'+(rowIndex+2)+':R'+(rowIndex+2);
+    return fetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/'+encodeURIComponent(range)+'?valueInputOption=USER_ENTERED',{
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+token.access_token,'Content-Type':'application/json'},
+      body:JSON.stringify({values:[['تم التوقيع', 'م.وهيب الصنوي', signTime]]})
+    });
+  })
+  .then(function(r){return r.json();})
+  .then(function(){
+    loadPOList();
+  })
+  .catch(function(err){
+    btn.disabled=false;
+    btn.textContent='✍️ توقيع وهيب الصنوي';
+    alert('خطأ: '+err.toString());
+  });
+}
+
+function loadPOList() {
+  var SHEET_ID = '1T9ezLe-REh_tN4RwMXfiSue6oy05aktkvUBm08G7KaI';
+  var SA_EMAIL = 'howaish-expenses@road-cafe-stock-dlvry-project.iam.gserviceaccount.com';
+  var PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDiKTx6TCqDP5km\ngXoZ11+t//iK+r4hPty/jDSXp1ch7w+YdbAbEz/NntWd2F1xn56obRFXRsteceyp\nCmqWcagKWDN5YSklIlaidIRoOK6quBgp5+u7SdBU0qm7pQsjs7p+YMk+ZYXPcAAc\nmXp5lKE+UMiYoelGfPo/cqz77xlqOZXOpgRGnNKy66Juk8qwMa61M3rGphkNoiaB\nZISjGcJ4C6sbJ+lSe84jfkp5mflWIuu41PpfpThj/TNp05eBPnRzSrPtTrdAHPJH\nSSY0m1LPmtvgPHzGkViosHGtcLn3gLDpQcDmUSqHCeG/3Gfi7NZYL2V3UaF1xsWX\nUtwZREj7AgMBAAECggEAYv2UpJ0hAIi+Uq3akWQFU6ZWFhLxVKDsw4StYnHTAB3g\n0CU3G2q+AxTSQIA7SmgI7ISs0exBSMoJweW2yLnfyQNZKHhAJ6pTjFD+wZWJ0ly4\n6uLB+hyxbOc2dtUjPpHE/9sCSubp/mVyDxKYmo3VU+7NFo3MCtfaOxpJIA7EK4tN\nTnZQjpGcG/PhsijIy7b76lWCytUqDUTt2VMdAnFH/e0g+iLwZzo5/wUOtGgu0gvx\nOTGZgW8TjBRolqrVfTQBjcqc88Ppe7FlZvluoadtqdYkZFjUOMsU/SVSpTb6DDJn\n+gfYWsnh1QZtzFyRkDv1Frd2DOvHsEwUKCzRnhqPRQKBgQD3nL5wX7MCsYPisl5D\nafzVfSpmU1zvWruQnnnyCKRVx60CYUS6mfijJtmxdNNss5bINlCZwK+wNU9xNYsA\nL4S34ZRMrK5268yxbAivj/mrzqQXVp3w/oqaeneCrkU8KrySmyb4rQgYkrlNnqMe\nQCIJDaD5ih5w6eNExtD81xhCFQKBgQDp0niErHGfOpIFuok0JfE9pFjDsxdJHh9r\nVlJ2dbkwGXv/sjoDBWYs09utS45GU6PoBxcWez9dCmEXodAjMexwJ/UOADvAclhW\nhYIIyIid3gf+gqgF6QakZ6pwplA1WIfy4A4rJjLUW/N9d9zc8qEhk22GI3PlEWGo\nkf4IxDPyzwKBgE+Tmkh3GQq2jhIfDNhRiaX60dOM2wM5f6ocpEg6qsW+pEVtiS8H\nKLcWV0QGraPzm3PAsOqY2F2i5GMXuBJZMyf9YTG7FV62rVQfyjLR7IVgpa+ycJPw\n2g6HaT0gULPjcDMVldK5mS58iPz/DKE+LzIFpURNNTdIk3eZBbUcU3l5AoGAdruA\npWZnoAJ+6dfKGif2M2YECQQlG+Tm8Xt5DlxDOHCIbdQT7zrLopHGKF6IlZ+dSJJp\nH+pfx6Ago35wkZ6lQGKZ5o0pylSGFRFgcZNbBEcd6hhwt+eXjt5xRxi8/AnDpwot\nR63y+7DhmOHHzo6KUeFqKUZRcI19+LqBs/PlqTMCgYADKWCfZpbKD0OJ0qQnWIDd\naIlXazoOeO2VyNrgs1nAJ1ie6/Hrl6wZlKRlQ3C6S/jtu3AS/GLQoogPfJ3AYL62\npExfcr8cjIJX3AxwU9uAcrtsn9+SDzxAYmrkaJQfuawqC1e+x7Ubt6q/Ma4H19uu\nFD48HsGV5Eyb4g76cBOOwg==\n-----END PRIVATE KEY-----\n';
+
+  function b64u(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
+  function b64uU8(a){return btoa(Array.from(a).map(function(b){return String.fromCharCode(b);}).join('')).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
+  var now=Math.floor(Date.now()/1000);
+  var si=b64u(JSON.stringify({alg:'RS256',typ:'JWT'}))+'.'+b64u(JSON.stringify({iss:SA_EMAIL,scope:'https://www.googleapis.com/auth/spreadsheets',aud:'https://oauth2.googleapis.com/token',exp:now+3600,iat:now}));
+  var bk=Uint8Array.from(atob(PRIVATE_KEY.replace('-----BEGIN PRIVATE KEY-----','').replace('-----END PRIVATE KEY-----','').replace(/\n/g,'').replace(/\s/g,'')),function(c){return c.charCodeAt(0);});
+
+  crypto.subtle.importKey('pkcs8',bk.buffer,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['sign'])
+  .then(function(k){return crypto.subtle.sign('RSASSA-PKCS1-v1_5',k,new TextEncoder().encode(si));})
+  .then(function(sig){
+    return fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion='+si+'.'+b64uU8(new Uint8Array(sig))});
+  })
+  .then(function(r){return r.json();})
+  .then(function(token){
+    if(!token.access_token) throw new Error('No token');
+    return fetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/Sheet3!A2:J1000',{
+      headers:{'Authorization':'Bearer '+token.access_token}
+    }).then(function(r){return r.json();});
+  })
+  .then(function(data){
+    var rows = data.values || [];
+    if(rows.length===0){
+      document.getElementById('po-list').innerHTML = '<div class="po-empty">لا توجد أوامر صرف بعد</div>';
+      return;
+    }
+    
+    // Get current week orders
+    var now = new Date();
+    var weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay() + 6); // Saturday
+    if(now.getDay() < 6) weekStart.setDate(weekStart.getDate() - 7);
+    
+    var totalAmt = 0;
+    var html = '';
+    rows.forEach(function(row, i) {
+      var serial=row[0]||'', date=row[1]||'', contractor=row[2]||'',
+          category=row[3]||'', payNo=row[4]||'', amount=parseFloat(row[5])||0,
+          notes=row[14]||'', status=row[15]||'بانتظار التوقيع', signTime=row[16]||'';
+      var projStr = '';
+      if(parseFloat(row[6])>0) projStr += 'م825: '+row[6]+'%  ';
+      if(parseFloat(row[7])>0) projStr += 'م600: '+row[7]+'%  ';
+      if(parseFloat(row[8])>0) projStr += 'م540: '+row[8]+'%  ';
+      if(parseFloat(row[9])>0) projStr += 'م360: '+row[9]+'%';
+      totalAmt += amount;
+      var isSigned = status.indexOf('تم التوقيع') !== -1;
+      html += '<div class="po-item">';
+      html += '<div class="po-item-header">';
+      html += '<div><div class="po-item-title">#'+serial+' — '+contractor+'</div>';
+      html += '<div style="font-size:11px;color:var(--text3);margin-top:2px">'+date+'</div></div>';
+      html += '<div style="text-align:left"><div class="po-item-amount">'+fmt(amount)+' ر.س</div>';
+      html += '<span class="po-badge '+(isSigned?'signed':'pending')+'">'+( isSigned?'✓ موقع':'⏳ بانتظار التوقيع')+'</span></div>';
+      html += '</div>';
+      html += '<div class="po-item-details">';
+      html += category+' &nbsp;|&nbsp; دفعة رقم '+payNo;
+      if(projStr) html += '<br><span style="font-size:11px">'+projStr+'</span>';
+      if(notes) html += '<br>'+notes;
+      if(isSigned && signTime) html += '<br><span style="color:#2d7a4f;font-size:11px">✓ وقّع م.وهيب — '+signTime+'</span>';
+      html += '</div>';
+      if(!isSigned) {
+        html += '<button class="po-sign-btn" onclick="confirmSign('+i+', this)">✍️ توقيع — م.وهيب الصنوي</button>';
+      } else {
+        html += '<div class="po-signed-label">✓ تم التوقيع</div>';
+      }
+      html += '</div>';
+    });
+    var summary = '<div class="week-summary"><div><div class="ws-label">إجمالي أوامر الصرف</div></div><div class="ws-val">'+fmt(totalAmt)+' ر.س</div></div>';
+    document.getElementById('po-list').innerHTML = summary + html;
+  })
+  .catch(function(err){
+    document.getElementById('po-list').innerHTML = '<div class="po-empty">خطأ في التحميل: '+err.toString()+'</div>';
+  });
+}
+
+function confirmSign(rowIndex, btn) {
+  // Ask for PIN before signing
+  document.getElementById('pin-overlay').style.display='flex';
+  document.getElementById('pin-input').value='';
+  document.getElementById('pin-input').classList.remove('err');
+  pinTarget = 'sign_'+rowIndex;
+  window._signBtn = btn;
+  setTimeout(function(){ document.getElementById('pin-input').focus(); },100);
+}
+
+// Extend checkPin for signing
+var _origCheckPin2 = checkPin;
+checkPin = function() {
+  var val = document.getElementById('pin-input').value;
+  if(pinTarget && pinTarget.indexOf('sign_') === 0) {
+    if(val === PO_PIN) {
+      document.getElementById('pin-overlay').style.display='none';
+      var rowIndex = parseInt(pinTarget.split('_')[1]);
+      signOrder(rowIndex, window._signBtn);
+    } else {
+      var inp = document.getElementById('pin-input');
+      inp.classList.add('err');
+      inp.value='';
+      setTimeout(function(){ inp.classList.remove('err'); },400);
+    }
+  } else {
+    _origCheckPin2();
+  }
+};
 </script>
 </body>
 </html>
