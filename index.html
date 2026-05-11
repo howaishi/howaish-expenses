@@ -1308,7 +1308,7 @@ function loadPOList() {
   .then(function(r){return r.json();})
   .then(function(token){
     if(!token.access_token) throw new Error('No token');
-    return fetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/Sheet3!A2:J1000',{
+    return fetch('https://sheets.googleapis.com/v4/spreadsheets/'+SHEET_ID+'/values/Sheet3!A2:R1000',{
       headers:{'Authorization':'Bearer '+token.access_token}
     }).then(function(r){return r.json();});
   })
@@ -1330,7 +1330,7 @@ function loadPOList() {
     rows.forEach(function(row, i) {
       var serial=row[0]||'', date=row[1]||'', contractor=row[2]||'',
           category=row[3]||'', payNo=row[4]||'', amount=parseFloat(row[5])||0,
-          notes=row[14]||'', status=row[15]||'بانتظار التوقيع', signTime=row[16]||'';
+          notes=row[14]||'', status=row[15]||'بانتظار التوقيع', signTime=row[17]||'';
       var projStr = '';
       if(parseFloat(row[6])>0) projStr += 'م825: '+row[6]+'%  ';
       if(parseFloat(row[7])>0) projStr += 'م600: '+row[7]+'%  ';
@@ -1343,18 +1343,18 @@ function loadPOList() {
       html += '<div><div class="po-item-title">#'+serial+' — '+contractor+'</div>';
       html += '<div style="font-size:11px;color:var(--text3);margin-top:2px">'+date+'</div></div>';
       html += '<div style="text-align:left"><div class="po-item-amount">'+fmt(amount)+' ر.س</div>';
-      html += '<span class="po-badge '+(isSigned?'signed':'pending')+'">'+( isSigned?'✓ موقع':'⏳ بانتظار التوقيع')+'</span></div>';
+      html += '<span class="po-badge '+(isSigned?'signed':'pending')+'">'+( isSigned?'✓ معتمدة':'⏳ بانتظار التوقيع')+'</span></div>';
       html += '</div>';
       html += '<div class="po-item-details">';
       html += category+' &nbsp;|&nbsp; دفعة رقم '+payNo;
       if(projStr) html += '<br><span style="font-size:11px">'+projStr+'</span>';
-      if(notes) html += '<br>'+notes;
-      if(isSigned && signTime) html += '<br><span style="color:#2d7a4f;font-size:11px">✓ وقّع م.وهيب — '+signTime+'</span>';
+      if(notes) html += '<br><span style="color:var(--text2)">📝 '+notes+'</span>';
+      if(isSigned && signTime) html += '<br><span style="color:#2d7a4f;font-size:11px">✓ اعتمد م.وهيب — '+signTime+'</span>';
       html += '</div>';
       if(!isSigned) {
         html += '<button class="po-sign-btn" onclick="confirmSign('+i+', this)">✍️ توقيع — م.وهيب الصنوي</button>';
       } else {
-        html += '<div class="po-signed-label">✓ تم التوقيع</div>';
+        html += '<div class="po-signed-label">✅ معتمدة — م.وهيب الصنوي</div>';
       }
       html += '</div>';
     });
